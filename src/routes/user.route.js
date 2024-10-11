@@ -16,4 +16,16 @@ router.post('/sign/admin', newUserValidator, roleMiddleware, userController.sign
 router.post('/login', userController.login)
 
 
+
+//route to delete a single user by their user id
+router.delete('/:_id', userController.deleteUser);
+
+
+
+
+
+
+
+
+
 export default router;

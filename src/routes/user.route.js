@@ -22,11 +22,6 @@ router.delete('/:_id', userController.deleteUser);
 
 
 
-// //route to get a single user by their user id
-// router.get('/:_id', userAuth, userController.getUser);
-
-// //route to update a single user by their user id
-// router.put('/:_id', userController.updateUser);
 
 
 

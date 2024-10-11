@@ -2,7 +2,7 @@ import * as wishlistService from '../services/wishlist.service';
 import HttpStatus from 'http-status-codes';
 
 export const getwishlist = async (req, res, next) => {
-    const data = await wishlistService.getwishlist(req.param, req.body)
+    const data = await wishlistService.getwishlist(req.body)
     try {
         res.status(HttpStatus.ACCEPTED).json({
             code: HttpStatus.ACCEPTED,

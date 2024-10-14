@@ -17,6 +17,7 @@ export const userAuth = (secretKey) => {
       bearerToken = bearerToken.split(' ')[1];
       let userDetails = jwt.verify(bearerToken, secretKey);
       req.body.role = userDetails.role
+req.body.userId=userDetails.userId
       console.log('user details----------', userDetails.role);
       next();
     } catch (error) {

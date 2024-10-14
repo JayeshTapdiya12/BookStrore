@@ -1,6 +1,13 @@
 import Book from '../models/books.model';
 import Cart from '../models/cart.model';
 
+
+export const getCart = async (body) => {
+    const data = await Cart.findOne({ _id: body.userId })
+    return data
+}
+
+
 export const addBook = async (bookID, body) => {
     const book = await Book.findOne({ _id: bookID });
     const isExistCart = await Cart.findOne({ cartBy: body.userId });

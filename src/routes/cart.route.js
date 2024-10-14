@@ -8,7 +8,7 @@ dotenv.config();
 const router = express.Router();
 
 
-
+router.get('/getcart', userAuth(process.env.hidden_key), cartController.getCart)
 router.get('/add/:_id', userAuth(process.env.hidden_key), cartController.addBook)
 router.delete('/remove/:_id', userAuth(process.env.hidden_key), cartController.removeBook)
 

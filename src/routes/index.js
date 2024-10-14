@@ -4,7 +4,7 @@ const router = express.Router();
 import userRoute from './user.route';
 
 
-=======
+
 import bookRoute from './book.route';
 import wishlistRoute from './wishlist.route'
 /**
@@ -20,7 +20,7 @@ const routes = () => {
 
   router.use('/books', bookRoute);
 
-router.use('/books/wishlist', wishlistRoute)
+  router.use('/books/wishlist', wishlistRoute)
   return router;
 };
 

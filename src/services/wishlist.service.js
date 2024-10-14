@@ -1,78 +1,66 @@
+import Wish from '../models/wishlist.model'
 import Book from '../models/books.model';
-import WishList from '../models/wishlist.model';
 
+export const getWishbyUserID = async (userID) => {
+    return await Wish.findOne({ wishBy: userID });
+};
 
-export const getwishlist = async (body) => {
-    const data = await WishList.findOne({ _id: body.userId });
-
-    return data;
-
-}
-
-
-export const addwishlist = async (bookID, body) => {
-    const book = await Book.findOne({ _id: bookID });
+export const addBookToWishlist = async (userID, bookID) => {
+    const book = await Book.findById(bookID);
     if (!book) {
-        throw new Error("Book not found");
+        throw new Error("Book not found in database");
     }
 
-    let wishlist = await WishList.findOne({ _id: body.userId });
+    let wish = await getWishbyUserID(userID);
 
-    if (wishlist) {
-        const existingBook = WishList.books.find(wishlistBook => wishlistBook.bookName === book.bookName);
-
-        if (existingBook) {
-            existingBook.quantity += 1;
-        } else {
-            WishList.books.push({
-                description: book.description,
-                discountPrice: book.discountPrice,
-                bookName: book.bookName,
-                author: book.author,
-                price: book.price,
-            });
-        }
-        await WishList.save();
-    } else {
-        const newWishlist = await WishList.create({
-            wishlistBy: body.userId,
-            books: [{
-                description: book.description,
-                discountPrice: book.discountPrice,
-                bookName: book.bookName,
-                author: book.author,
-                price: book.price,
-            }]
+    if (!wish) {
+        wish = new Wish({
+            wishBy: userID,
+            book: []
         });
-        await newWishlist.save();
-        WishList = newWishlist;
     }
 
-    return wishlist;
+    const existingBook = wish.book.find(b => b._id.equals(book._id)); // Use mongoose comparison
 
+    if (existingBook) {
+        return { message: "Book already in wishlist" };
+    }
 
-}
+    wish.book.push({
+        _id: book._id,
+        bookname: book.bookName,
+        authorname: book.authorname
+    });
 
+    await wish.save();
+    return { message: "Book added to wishlist", wishlist: wish };
+};
 
-export const removewishlist = async (bookID, body) => {
-    const wishlist = await WishList.findOne({ wishlistBy: body.userId });
+export const removeBookFromWishlist = async (userID, bookID) => {
+    const book = await Book.findById(bookID);
+    if (!book) {
+        throw new Error("Book not found in database");
+    }
 
-    if (!wishlist) {
+    let wish = await getWishbyUserID(userID);
+
+    if (!wish) {
         throw new Error("Wishlist not found");
     }
 
+    const existingBook = wish.book.find(b => b._id.equals(book._id)); // Use mongoose comparison
 
-    const bookIndex = WishList.books.findIndex(book => book._id.toString() === bookID);
-
-    if (bookIndex === -1) {
-        throw new Error("Book not found in wishlist");
+    if (!existingBook) {
+        return { message: "Book not found in wishlist" };
     }
 
+    wish.book = wish.book.filter(b => !b._id.equals(book._id)); // Remove the book
 
-    WishList.books.splice(bookIndex, 1);
+    if (wish.book.length === 0) {
+        await Wish.deleteOne({ _id: wish._id }); // Delete the wishlist if empty
+        return { message: "Wishlist is now empty and has been removed." };
+    }
 
-
-    await WishList.save();
-
-    return WishList;
-}
+    await wish.save();
+    return { message: "Book removed from wishlist", wishlist: wish };
+};

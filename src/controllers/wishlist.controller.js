@@ -1,54 +1,48 @@
-import * as wishlistService from '../services/wishlist.service';
+import { getWishbyUserID, addBookToWishlist, removeBookFromWishlist } from '../services/wishlist.service';
 import HttpStatus from 'http-status-codes';
 
-export const getwishlist = async (req, res, next) => {
-    const data = await wishlistService.getwishlist(req.body)
+export const getUserWish = async (req, res, next) => {
     try {
-        res.status(HttpStatus.ACCEPTED).json({
-            code: HttpStatus.ACCEPTED,
-            data: data,
-            message: 'wishlist retrived'
-        })
-    } catch (error) {
-        res.status(HttpStatus.BAD_REQUEST).json({
-            code: HttpStatus.BAD_REQUEST,
-            message: `${error}`
-        })
+        const userId = req.user.id;
+        const wish = await getWishbyUserID(userId);
+        res.status(HttpStatus.OK).json({ message: 'Wishlist rerieved', wishlist: wish });
+    }
+    catch (error) {
+        console.error('Error adding book to wishlist:', error);
+        next(error);
     }
 }
 
-
-
-export const addwishlist = async (req, res, next) => {
-    const data = await wishlistService.addwishlist(req.param, req.body)
+export const addBookToUserWish = async (req, res, next) => {
     try {
-        res.status(HttpStatus.ACCEPTED).json({
-            code: HttpStatus.ACCEPTED,
-            data: data,
-            message: 'book addeded to wishlist'
-        })
+        const userId = req.body.userId;
+        const bookId = req.params;
+
+        console.log('Authenticated User ID:', userId);
+        console.log('Book ID to add:', bookId);
+
+        const updatedWish = await addBookToWishlist(userId, bookId);
+
+        res.status(HttpStatus.OK).json({ message: 'Book added to wishlist', wish: updatedWish });
     } catch (error) {
-        res.status(HttpStatus.BAD_REQUEST).json({
-            code: HttpStatus.BAD_REQUEST,
-            message: `${error}`
-        })
+        console.error('Error adding book to cart:', error);
+        next(error);
     }
-}
+};
 
-
-
-export const removewishlist = async (req, res, next) => {
-    const data = await wishlistService.removewishlist(req.param, req.body)
+export const removeBookFromUserWish = async (req, res, next) => {
     try {
-        res.status(HttpStatus.ACCEPTED).json({
-            code: HttpStatus.ACCEPTED,
-            data: data,
-            message: 'book remove from wishlist'
-        })
+        const userId = req.body.userId;
+        const bookId = req.params;
+
+        console.log('Authenticated User ID:', userId);
+        console.log('Book ID to remove:', bookId);
+
+        const updatedWish = await removeBookFromWishlist(userId, bookId);
+
+        res.status(HttpStatus.OK).json({ message: 'Book removed from wishlist', wish: updatedWish });
     } catch (error) {
-        res.status(HttpStatus.BAD_REQUEST).json({
-            code: HttpStatus.BAD_REQUEST,
-            message: `${error}`
-        })
+        console.error('Error removing book from cart:', error);
+        next(error);
     }
-}
+};
